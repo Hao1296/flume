@@ -438,6 +438,7 @@ public class ReliableSpoolingFileEventReader implements ReliableEventReader {
   @Override
   public void commit() throws IOException {
     if (!committed && currentFile.isPresent()) {
+      // mark方法会将消费位置写入到trackFile
       currentFile.get().getDeserializer().mark();
       committed = true;
     }

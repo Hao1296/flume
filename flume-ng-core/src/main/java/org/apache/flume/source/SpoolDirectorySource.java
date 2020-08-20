@@ -269,7 +269,16 @@ public class SpoolDirectorySource extends AbstractSource
           sourceCounter.incrementAppendBatchReceivedCount();
 
           try {
+            /*
+             * processEventBatch过程:
+             * 1. 判断本批events涉及到哪些channel;
+             * 2. 循环处理各channel;
+             *   a. 调用getTransaction开启事务;
+             *   b. 将对应events写入该channel;
+             *   c. commit该channel上的事务;
+             */
             getChannelProcessor().processEventBatch(events);
+            // 写入将文件读取位置写入trackFile(相当于是source侧的事务commit)
             reader.commit();
           } catch (ChannelFullException ex) {
             logger.warn("The channel is full, and cannot write data now. The " +
